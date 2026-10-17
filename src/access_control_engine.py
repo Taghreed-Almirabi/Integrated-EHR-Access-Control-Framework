@@ -149,6 +149,12 @@ class AccessControlEngine:
             return self._finish(
                 request, AccessDecision.DENY, "Authentication is required."
             )
+        if not request.user_id or not request.user_id.strip():
+            return self._finish(
+                request,
+                AccessDecision.DENY,
+                "A valid user identifier is required.",
+            )
 
         if request.emergency:
             return self._evaluate_break_glass(request)

@@ -1,0 +1,33 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.15, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\tb4e2\OneDrive\Desktop\Integrated-EHR-Access-Control-Framework\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\tb4e2\OneDrive\Desktop\Integrated-EHR-Access-Control-Framework
+collecting ... collected 25 items
+
+tests/test_access_control.py::test_assigned_physician_is_permitted PASSED [  4%]
+tests/test_access_control.py::test_unauthenticated_user_is_denied PASSED [  8%]
+tests/test_access_control.py::test_inactive_account_is_denied PASSED     [ 12%]
+tests/test_access_control.py::test_unassigned_nurse_is_denied PASSED     [ 16%]
+tests/test_access_control.py::test_patient_identifier_is_required PASSED [ 20%]
+tests/test_access_control.py::test_it_administrator_cannot_view_clinical_record PASSED [ 24%]
+tests/test_access_control.py::test_access_outside_duty_period_is_denied PASSED [ 28%]
+tests/test_access_control.py::test_off_network_access_requires_mfa PASSED [ 32%]
+tests/test_access_control.py::test_unmanaged_device_requires_mfa PASSED  [ 36%]
+tests/test_access_control.py::test_high_risk_export_requires_mfa PASSED  [ 40%]
+tests/test_access_control.py::test_high_risk_export_is_permitted_after_mfa PASSED [ 44%]
+tests/test_access_control.py::test_valid_break_glass_access_is_granted PASSED [ 48%]
+tests/test_access_control.py::test_break_glass_is_denied_for_nonclinical_role PASSED [ 52%]
+tests/test_access_control.py::test_break_glass_requires_justification PASSED [ 56%]
+tests/test_access_control.py::test_audit_checksum_detects_tampering PASSED [ 60%]
+tests/test_system_integration.py::test_permitted_request_is_saved PASSED [ 64%]
+tests/test_system_integration.py::test_denied_request_is_saved PASSED    [ 68%]
+tests/test_system_integration.py::test_break_glass_request_is_saved PASSED [ 72%]
+tests/test_unit7_system_acceptance.py::test_blank_user_id_is_denied_and_audited PASSED [ 76%]
+tests/test_unit7_system_acceptance.py::test_acceptance_authorized_physician_is_permitted PASSED [ 80%]
+tests/test_unit7_system_acceptance.py::test_acceptance_high_risk_export_requires_mfa PASSED [ 84%]
+tests/test_unit7_system_acceptance.py::test_acceptance_break_glass_is_time_limited_and_audited PASSED [ 88%]
+tests/test_unit7_system_acceptance.py::test_acceptance_it_admin_is_denied_clinical_access PASSED [ 92%]
+tests/test_unit7_system_acceptance.py::test_system_mixed_workflow_creates_complete_audit_trail PASSED [ 96%]
+tests/test_unit7_system_acceptance.py::test_stability_fifty_requests_are_processed_without_loss PASSED [100%]
+
+============================= 25 passed in 0.44s ==============================

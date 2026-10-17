@@ -1,0 +1,6 @@
+Metric,Result,Metric Type
+Decision accuracy,100.00%,Quantitative
+Average latency,3.704 ms,Quantitative
+Throughput,269.96 requests/second,Quantitative
+Peak memory,0.117 MB,Quantitative
+Interface clarity,4.60/5,Qualitative
