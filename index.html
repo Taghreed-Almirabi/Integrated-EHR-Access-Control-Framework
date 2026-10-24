@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Taghreed Almirabi — EHR Access Control Framework (MSIT Capstone)</title>
+<meta name="description" content="Capstone portfolio of Taghreed Almirabi: an integrated access-control framework for electronic health records in a Saudi government hospital — role-based access control, step-up MFA, contextual authorization, break-glass emergency access and tamper-evident audit logging, built in Python and verified with 25 automated tests.">
+<meta name="author" content="Taghreed Almirabi">
+<meta name="keywords" content="Taghreed Almirabi, access control, RBAC, multifactor authentication, MFA, break-glass, audit logging, electronic health records, EHR security, healthcare cybersecurity, Python, pytest, MSIT capstone, University of the People, Saudi Arabia">
+<meta property="og:title" content="Taghreed Almirabi — EHR Access Control Framework">
+<meta property="og:description" content="Role-based, context-aware access control for electronic health records, with step-up MFA, break-glass emergency access and HMAC-protected audit logging. MSIT capstone project.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #14263D;
+    --muted: #51627A;
+    --rule: #D7DEE5;
+    --paper: #FFFFFF;
+    --band: #EEF3F1;
+    --console: #0E1F33;
+    --console-2: #17304F;
+    --console-text: #E6EDF5;
+    --console-muted: #9DB0C7;
+    --teal: #0B7A6B;
+    --teal-dark: #085C51;
+    --red: #B9302A;
+    --amber: #8F5400;
+    --permit-on-dark: #4FD1A5;
+    --deny-on-dark: #FF7B6E;
+    --mfa-on-dark: #F5B841;
+    --glass-on-dark: #FFA791;
+    --focus: #1C6DD0;
+    --max: 1080px;
+    --sans: "IBM Plex Sans", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --arabic: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; animation: none !important; } }
+  body {
+    margin: 0;
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--ink);
+    background: var(--paper);
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--teal); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  a:hover { color: var(--teal-dark); }
+  :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 2px; }
+  .skip { position: absolute; left: -999px; top: 8px; background: var(--ink); color: #fff; padding: 8px 12px; z-index: 10; }
+  .skip:focus { left: 8px; }
+  .wrap { max-width: var(--max); margin: 0 auto; padding: 0 24px; }
+  h1, h2, h3 { font-weight: 600; letter-spacing: -0.01em; line-height: 1.15; margin: 0; }
+  h1 { font-size: clamp(30px, 4.2vw, 42px); }
+  h2 { font-size: clamp(24px, 3vw, 30px); margin-bottom: 8px; }
+  h3 { font-size: 20px; margin-bottom: 6px; }
+  p { margin: 0 0 1em; max-width: 68ch; }
+  .lede { font-size: 19px; color: var(--ink); }
+  .muted { color: var(--muted); }
+  code, .mono { font-family: var(--mono); font-size: 0.9em; }
+  code { background: #F1F4F6; padding: 1px 5px; border-radius: 3px; }
+
+  /* Header */
+  header.site { border-bottom: 1px solid var(--rule); }
+  header.site .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 64px; flex-wrap: wrap; padding-top: 8px; padding-bottom: 8px; }
+  .brand { font-weight: 600; text-decoration: none; color: var(--ink); font-size: 17px; }
+  nav.primary ul { list-style: none; display: flex; gap: 22px; margin: 0; padding: 0; flex-wrap: wrap; }
+  nav.primary a { color: var(--ink); text-decoration: none; font-size: 15.5px; padding: 6px 0; border-bottom: 2px solid transparent; }
+  nav.primary a:hover { border-bottom-color: var(--teal); }
+
+  /* Hero */
+  .hero { padding: 56px 0 64px; }
+  .hero .wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 48px; align-items: start; }
+  .arabic { font-family: var(--arabic); font-size: 20px; color: var(--muted); direction: rtl; text-align: left; margin: 14px 0 22px; line-height: 1.7; }
+  .results { list-style: none; margin: 28px 0 32px; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+  .results li { border-left: 2px solid var(--teal); padding-left: 14px; }
+  .results strong { display: block; font-size: 26px; font-weight: 600; line-height: 1.1; }
+  .results span { font-size: 14.5px; color: var(--muted); line-height: 1.35; display: block; margin-top: 4px; }
+  .actions { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn { display: inline-block; padding: 11px 18px; border-radius: 6px; font-weight: 500; text-decoration: none; font-size: 16px; border: 1.5px solid var(--teal); }
+  .btn.primary { background: var(--teal); color: #fff; }
+  .btn.primary:hover { background: var(--teal-dark); border-color: var(--teal-dark); color: #fff; }
+  .btn.secondary { color: var(--teal-dark); background: #fff; }
+  .btn.secondary:hover { background: #EDF6F4; }
+
+  /* Console */
+  .console { background: var(--console); color: var(--console-text); border-radius: 10px; padding: 22px 22px 18px; }
+  .console h2 { font-size: 18px; font-weight: 500; color: #fff; margin: 0 0 4px; letter-spacing: 0; }
+  .console .sub { font-size: 13.5px; color: var(--console-muted); margin: 0 0 16px; max-width: none; }
+  .console .sub a { color: #BFD6F2; }
+  .presets { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .presets button { font: inherit; font-size: 13.5px; color: var(--console-text); background: var(--console-2); border: 1px solid #27466E; border-radius: 999px; padding: 6px 12px; cursor: pointer; }
+  .presets button:hover { background: #1E3D63; }
+  .presets button[aria-pressed="true"] { background: #E6EDF5; color: var(--console); border-color: #E6EDF5; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; }
+  .field label { display: block; font-size: 13px; color: var(--console-muted); margin-bottom: 4px; }
+  .field select, .field input[type="text"], .field textarea { width: 100%; font: inherit; font-size: 14.5px; color: var(--console-text); background: #0A1829; border: 1px solid #2B4A72; border-radius: 6px; padding: 8px 10px; }
+  .field textarea { resize: vertical; min-height: 58px; }
+  .toggles { list-style: none; margin: 14px 0 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 6px 16px; }
+  .toggles label { display: flex; gap: 9px; align-items: center; font-size: 14.5px; cursor: pointer; padding: 3px 0; }
+  .toggles input { width: 16px; height: 16px; accent-color: #4FD1A5; margin: 0; }
+  .toggles label.emergency input { accent-color: #FFA791; }
+  .justification { margin-top: 10px; }
+  .justification[hidden] { display: none; }
+  .decision { margin-top: 18px; padding-top: 16px; border-top: 1px solid #27466E; }
+  .decision .code { font-family: var(--mono); font-size: 24px; font-weight: 500; letter-spacing: 0.01em; display: flex; align-items: center; gap: 10px; }
+  .decision .code::before { content: ""; width: 12px; height: 12px; border-radius: 50%; background: currentColor; flex: none; }
+  .decision[data-decision="PERMIT"] .code { color: var(--permit-on-dark); }
+  .decision[data-decision="DENY"] .code { color: var(--deny-on-dark); }
+  .decision[data-decision="STEP_UP_MFA"] .code { color: var(--mfa-on-dark); }
+  .decision[data-decision="BREAK_GLASS_PERMIT"] .code { color: var(--glass-on-dark); }
+  .decision .reason { margin: 6px 0 10px; font-size: 15.5px; color: #fff; max-width: none; }
+  .decision .audit { font-family: var(--mono); font-size: 12.5px; color: var(--console-muted); line-height: 1.7; word-break: break-all; margin: 0; max-width: none; }
+  .decision .audit span { color: #D4DEEA; }
+
+  /* Sections */
+  section.block { padding: 64px 0; border-top: 1px solid var(--rule); }
+  section.block.band { background: var(--band); border-top: 0; }
+  .intro { max-width: 68ch; margin-bottom: 28px; }
+  .three { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; }
+  .three h3 { padding-top: 10px; border-top: 2px solid var(--ink); }
+  .three p { font-size: 16px; }
+
+  ol.steps { counter-reset: step; list-style: none; padding: 0; margin: 0; max-width: 760px; }
+  ol.steps li { counter-increment: step; display: grid; grid-template-columns: 34px 1fr; gap: 14px; padding: 11px 0; border-bottom: 1px solid var(--rule); font-size: 16px; }
+  ol.steps li::before { content: counter(step); font-family: var(--mono); font-size: 14px; color: var(--muted); padding-top: 3px; }
+  ol.steps .outcome { font-family: var(--mono); font-size: 13px; display: block; margin-top: 2px; }
+  .deny { color: var(--red); } .mfa { color: var(--amber); } .permit { color: var(--teal-dark); }
+
+  .two { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: 40px; align-items: start; margin-top: 28px; }
+  table { border-collapse: collapse; width: 100%; font-size: 15.5px; }
+  th, td { text-align: left; vertical-align: top; padding: 9px 12px 9px 0; border-bottom: 1px solid var(--rule); overflow-wrap: anywhere; }
+  th { font-weight: 600; font-size: 14.5px; }
+  td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td.mono { white-space: nowrap; }
+  .table-wrap { overflow-x: auto; }
+  figure { margin: 28px 0 0; }
+  figure img { width: 100%; height: auto; border: 1px solid var(--rule); background: #fff; }
+  figcaption { font-size: 14px; color: var(--muted); margin-top: 8px; }
+
+  ul.deliverables { list-style: none; padding: 0; margin: 0; }
+  ul.deliverables li { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 2fr); gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--rule); }
+  ul.deliverables li > div:first-child { font-weight: 600; }
+  ul.deliverables li p { margin: 0; font-size: 15.5px; }
+  .pending { font-size: 13.5px; color: var(--muted); }
+
+  .about { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 40px; }
+  .about ul { list-style: none; padding: 0; margin: 0; }
+  .about li { padding: 8px 0; border-bottom: 1px solid var(--rule); }
+  footer.site { padding: 28px 0 40px; font-size: 14px; color: var(--muted); border-top: 1px solid var(--rule); }
+  footer.site p { max-width: none; margin: 0 0 6px; }
+
+  @media (max-width: 900px) {
+    .hero .wrap { grid-template-columns: minmax(0, 1fr); gap: 36px; }
+    .three, .two, .about { grid-template-columns: minmax(0, 1fr); }
+    .three h3 { margin-top: 0; }
+  }
+  @media (max-width: 560px) {
+    .results { grid-template-columns: 1fr; gap: 14px; }
+    .grid2, .toggles { grid-template-columns: minmax(0, 1fr); }
+    ul.deliverables li { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+    table { font-size: 14.5px; }
+    section.block { padding: 48px 0; }
+    .hero { padding: 40px 0 48px; }
+    nav.primary ul { gap: 10px 18px; }
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="#top">Taghreed Almirabi</a>
+    <nav class="primary" aria-label="Sections">
+      <ul>
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#how-it-works">How it works</a></li>
+        <li><a href="#evidence">Evidence</a></li>
+        <li><a href="#deliverables">Deliverables</a></li>
+        <li><a href="#about">About</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero" id="top">
+    <div class="wrap">
+      <div>
+        <h1>An integrated access-control framework for electronic health records in a Saudi government hospital</h1>
+        <p class="arabic" lang="ar">إطار متكامل للتحكم في الوصول إلى السجلات الصحية الإلكترونية في مستشفى حكومي سعودي</p>
+        <p class="lede">Hospital staff need patient records in seconds, and that same openness is what exposes records to misuse. This capstone prototype decides every request by role, context and risk, grants time-limited emergency access with a written justification, and leaves an audit trail that detects tampering.</p>
+        <ul class="results" aria-label="Headline results">
+          <li><strong>25 of 25</strong><span>automated tests passing (unit, integration, system, acceptance)</span></li>
+          <li><strong>100%</strong><span>decision accuracy on 36 labelled scenarios, zero false permits</span></li>
+          <li><strong>3.2 ms</strong><span>mean decision latency over 300 audited requests (p99 4.2 ms)</span></li>
+        </ul>
+        <div class="actions">
+          <a class="btn primary" href="files/Taghreed_Almirabi_Capstone_Report.pdf">Read the report (PDF)</a>
+          <a class="btn secondary" href="https://github.com/Taghreed-Almirabi/Integrated-EHR-Access-Control-Framework">Code on GitHub</a>
+        </div>
+      </div>
+
+      <div class="console" aria-labelledby="console-title">
+        <h2 id="console-title">Try an access request</h2>
+        <p class="sub">Runs in your browser and mirrors the rules in <a href="https://github.com/Taghreed-Almirabi/Integrated-EHR-Access-Control-Framework/blob/main/src/access_control_engine.py">access_control_engine.py</a> (release v1.3.0-final). Synthetic users and patients only.</p>
+        <div class="presets" role="group" aria-label="Example scenarios">
+          <button type="button" data-preset="permit">Assigned physician on duty</button>
+          <button type="button" data-preset="mfa">Nurse on an unmanaged device</button>
+          <button type="button" data-preset="deny">IT administrator opens a chart</button>
+          <button type="button" data-preset="glass">Emergency: unassigned physician</button>
+        </div>
+        <form id="request" autocomplete="off">
+          <div class="grid2">
+            <div class="field">
+              <label for="role">Role</label>
+              <select id="role" name="role">
+                <option value="physician">Physician</option>
+                <option value="nurse">Nurse</option>
+                <option value="pharmacist">Pharmacist</option>
+                <option value="lab_technician">Laboratory technician</option>
+                <option value="health_information_manager">Health information manager</option>
+                <option value="it_systems_administrator">IT systems administrator</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="action">Requested action</label>
+              <select id="action" name="action">
+                <option value="view_patient_record">View patient record</option>
+                <option value="update_clinical_notes">Update clinical notes</option>
+                <option value="prescribe_medication">Prescribe medication</option>
+                <option value="administer_medication">Administer medication</option>
+                <option value="dispense_medication">Dispense medication</option>
+                <option value="record_lab_result">Record lab result</option>
+                <option value="export_patient_record">Export patient record</option>
+                <option value="manage_user_accounts">Manage user accounts</option>
+                <option value="review_audit_logs">Review audit logs</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="user">User ID</label>
+              <input type="text" id="user" name="user" value="DR-1042">
+            </div>
+            <div class="field">
+              <label for="patient">Patient ID (leave empty for no patient)</label>
+              <input type="text" id="patient" name="patient" value="PT-2093">
+            </div>
+          </div>
+          <ul class="toggles">
+            <li><label><input type="checkbox" name="account_active" checked> Account active</label></li>
+            <li><label><input type="checkbox" name="authenticated" checked> Authenticated</label></li>
+            <li><label><input type="checkbox" name="on_duty" checked> On duty</label></li>
+            <li><label><input type="checkbox" name="assigned" checked> Assigned to this patient</label></li>
+            <li><label><input type="checkbox" name="on_network" checked> On the hospital network</label></li>
+            <li><label><input type="checkbox" name="managed_device" checked> Managed device</label></li>
+            <li><label><input type="checkbox" name="mfa"> MFA verified</label></li>
+            <li><label class="emergency"><input type="checkbox" name="emergency"> Emergency (break-glass)</label></li>
+          </ul>
+          <div class="field justification" id="justification-field" hidden>
+            <label for="justification">Emergency justification (at least 10 characters)</label>
+            <textarea id="justification" name="justification" rows="2"></textarea>
+          </div>
+        </form>
+        <div class="decision" id="decision" data-decision="PERMIT" aria-live="polite" aria-atomic="true">
+          <div class="code" id="decision-code">PERMIT</div>
+          <p class="reason" id="decision-reason">Role and contextual access checks passed.</p>
+          <p class="audit" id="decision-audit"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="overview">
+    <div class="wrap">
+      <h2>Overview</h2>
+      <p class="intro muted">Master of Science in Information Technology capstone, University of the People (MSIT 5910, 2026), supervised by Dr. Stella T. Whyte.</p>
+      <div class="three">
+        <div>
+          <h3>Problem</h3>
+          <p>Government hospitals in Saudi Arabia are moving to shared electronic records while the Personal Data Protection Law and the National Cybersecurity Authority's Essential Cybersecurity Controls raise the bar for who may see what. Flat role permissions either over-expose records or block clinicians when minutes matter.</p>
+        </div>
+        <div>
+          <h3>Approach</h3>
+          <p>A single policy engine evaluates each request in a fixed order: account and authentication state, emergency status, role permissions, patient context, duty period, clinician–patient assignment, then risk. High-risk contexts step up to MFA instead of a flat deny. Emergency access is limited to clinical roles, lasts 15 minutes and must carry a justification. Every decision is written to SQLite with an HMAC-SHA256 checksum.</p>
+        </div>
+        <div>
+          <h3>Result</h3>
+          <p>A Python 3.12 prototype released in six tagged versions, verified by 25 pytest cases across unit, integration, system and acceptance levels, with 100% decision accuracy on 36 labelled scenarios, 3.2 ms mean and 4.2 ms p99 latency and about 312 audited requests per second on a laptop. Two healthcare IT experts rated it 4.85 / 5, quality was reviewed against ISO/IEC 25010, and the audit checksum was shown to detect tampering.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="how-it-works">
+    <div class="wrap">
+      <h2>How a request is decided</h2>
+      <p class="intro muted">The engine stops at the first failing check and records the reason. The order below is the order in the code.</p>
+      <div class="two">
+        <ol class="steps" aria-label="Decision sequence">
+          <li><div>Is the account active?<span class="outcome deny">if not: DENY — Account is inactive.</span></div></li>
+          <li><div>Is the user authenticated?<span class="outcome deny">if not: DENY — Authentication is required.</span></div></li>
+          <li><div>Is a user identifier present?<span class="outcome deny">if not: DENY — A valid user identifier is required.</span></div></li>
+          <li><div>Is this an emergency? Physicians and nurses may break the glass for a clinical action on a named patient with a written justification.<span class="outcome mfa">if valid: BREAK_GLASS_PERMIT for 15 minutes, flagged for review</span></div></li>
+          <li><div>Does the role permit the action?<span class="outcome deny">if not: DENY — The requested action is not permitted for this role.</span></div></li>
+          <li><div>Does a patient action name a patient?<span class="outcome deny">if not: DENY — A patient identifier is required for this action.</span></div></li>
+          <li><div>Is the user within an active duty period?<span class="outcome deny">if not: DENY — Access is outside the user's active duty period.</span></div></li>
+          <li><div>Is the clinician assigned to this patient?<span class="outcome deny">if not: DENY — The clinician is not assigned to this patient.</span></div></li>
+          <li><div>Is the context high-risk (export, account management, off-network or unmanaged device) without MFA?<span class="outcome mfa">if so: STEP_UP_MFA — otherwise</span><span class="outcome permit">PERMIT — Role and contextual access checks passed.</span></div></li>
+        </ol>
+        <div>
+          <h3>Role matrix</h3>
+          <table>
+            <thead><tr><th scope="col">Role</th><th scope="col">Permitted actions</th></tr></thead>
+            <tbody>
+              <tr><td>Physician</td><td>View record, update clinical notes, prescribe medication</td></tr>
+              <tr><td>Nurse</td><td>View record, update clinical notes, administer medication</td></tr>
+              <tr><td>Pharmacist</td><td>View record, dispense medication</td></tr>
+              <tr><td>Laboratory technician</td><td>View record, record lab result</td></tr>
+              <tr><td>Health information manager</td><td>View record, export record (MFA), review audit logs</td></tr>
+              <tr><td>IT systems administrator</td><td>Manage user accounts (MFA), review audit logs — no clinical access</td></tr>
+            </tbody>
+          </table>
+          <p class="muted" style="font-size:14px; margin-top:12px;">Design documents: <a href="https://github.com/Taghreed-Almirabi/Integrated-EHR-Access-Control-Framework/tree/main/docs">testing and maintenance plan</a>, <a href="https://github.com/Taghreed-Almirabi/Integrated-EHR-Access-Control-Framework/blob/main/deployment/DEPLOYMENT.md">deployment and configuration guide</a>, <a href="https://github.com/Taghreed-Almirabi/Integrated-EHR-Access-Control-Framework/blob/main/Dockerfile">Dockerfile</a>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block band" id="evidence">
+    <div class="wrap">
+      <h2>Evidence</h2>
+      <p class="intro muted">Every number here links to the file in the repository that produced it.</p>
+      <div class="two">
+        <div>
+          <h3>Measured results</h3>
+          <div class="table-wrap">
+          <table>
+            <thead><tr><th scope="col">Metric</th><th scope="col">Result</th><th scope="col">How it was measured</th></tr></thead>
+            <tbody>
+              <tr><td>Decision accuracy</td><td class="num">100.00%</td><td>36 labelled scenarios, six per role, compared with expected decisions; 0 false permits</td></tr>
+              <tr><td>Mean latency</td><td class="num">3.196 ms</td><td>300 sequential requests after 10 warm-up requests, each timed with <code>time.perf_counter</code></td></tr>
+              <tr><td>Median / p95 / p99 latency</td><td class="num">3.131 / 3.976 / 4.205 ms</td><td>Distribution of the 300 timed requests; design target 250 ms</td></tr>
+              <tr><td>Throughput</td><td class="num">312.18 req/s</td><td>Same run, each request written to the SQLite audit repository</td></tr>
+              <tr><td>Peak memory</td><td class="num">0.127 MB</td><td><code>tracemalloc</code> during the measured run</td></tr>
+              <tr><td>Interface clarity</td><td class="num">4.60 / 5</td><td>Heuristic review of decision labels, reasons, input consistency and audit traceability</td></tr>
+              <tr><td>Expert validation</td><td class="num">4.85 / 5</td><td>Ten-statement review by two healthcare IT experts; both recommended a pilot</td></tr>
+            </tbody>
+          </table>
+          </div>
+          <p class="muted" style="font-size:14px; margin-top:12px;">Source: <a href="https://github.com/Taghreed-Almirabi/Integrated-EHR-Access-Control-Framework/blob/main/results/evaluation_results.csv">evaluation_results.csv</a>, produced by <a href="https://github.com/Taghreed-Almirabi/Integrated-EHR-Access-Control-Framework/blob/main/performance_evaluation.py">performance_evaluation.py</a> on Windows 11, Python 3.12.15, 12 logical CPUs, 7.7 GB (release v1.3.0-final).</p>
+        </div>
+        <div>
+          <h3>Test suite</h3>
+          <table>
+            <thead><tr><th scope="col">Level</th><th scope="col">Tests</th><th scope="col">File</th></tr></thead>
+            <tbody>
+              <tr><td>Unit</td><td class="num">15</td><td><a href="https://github.com/Taghreed-Almirabi/Integrated-EHR-Access-Control-Framework/blob/main/tests/test_access_control.py">test_access_control.py</a></td></tr>
+              <tr><td>Integration</td><td class="num">3</td><td><a href="https://github.com/Taghreed-Almirabi/Integrated-EHR-Access-Control-Framework/blob/main/tests/test_system_integration.py">test_system_integration.py</a></td></tr>
+              <tr><td>System and acceptance</td><td class="num">7</td><td><a href="https://github.com/Taghreed-Almirabi/Integrated-EHR-Access-Control-Framework/blob/main/tests/test_unit7_system_acceptance.py">test_unit7_system_acceptance.py</a></td></tr>
+            </tbody>
+          </table>
+          <p class="muted" style="font-size:14px; margin-top:12px;">25 passed in 0.44 s with pytest 9.1.1 — <a href="https://github.com/Taghreed-Almirabi/Integrated-EHR-Access-Control-Framework/blob/main/results/unit7_full_test_log.txt">full test log</a>. Cases include tamper detection on the audit checksum, time-limited break-glass access, and a 50-request stability run with no lost audit events.</p>
+        </div>
+      </div>
+      <figure>
+        <img src="https://raw.githubusercontent.com/Taghreed-Almirabi/Integrated-EHR-Access-Control-Framework/main/results/system_evaluation_chart.png" alt="Four bar charts from the final evaluation: policy decision accuracy 100 percent on 36 labelled cases; request latency mean 3.20, median 3.13, p95 3.98 and p99 4.20 milliseconds; throughput 312.18 requests per second; and interface clarity scores of 4 to 5 out of 5." loading="lazy" width="2379" height="1577">
+        <figcaption>System evaluation chart generated by the evaluation script and committed to <a href="https://github.com/Taghreed-Almirabi/Integrated-EHR-Access-Control-Framework/tree/main/results">results/</a>.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="block" id="deliverables">
+    <div class="wrap">
+      <h2>Deliverables</h2>
+      <p class="intro muted">The complete capstone package, in the order a reviewer would read it.</p>
+      <ul class="deliverables">
+        <li>
+          <div><a href="files/Taghreed_Almirabi_Capstone_Report.pdf">Final capstone report (PDF)</a></div>
+          <p>Six chapters: introduction and objectives, literature review, system design, results, discussion and conclusion, with APA 7 references and appendices (requirements catalogue, role matrix, break-glass workflow, reviewer form).</p>
+        </li>
+        <li>
+          <div><a href="files/Taghreed_Almirabi_Capstone_Presentation.pdf">Final presentation (PDF)</a></div>
+          <p>Slides from the Unit 8 presentation: problem, architecture, demo and evaluation results.</p>
+        </li>
+        <li>
+          <div><a href="https://www.youtube.com/watch?v=REPLACE_WITH_VIDEO_ID">Demo video</a></div>
+          <p>A short walkthrough of a permitted request, a step-up MFA request, an emergency override and the audit trail each one leaves.</p>
+        </li>
+        <li>
+          <div><a href="https://github.com/Taghreed-Almirabi/Integrated-EHR-Access-Control-Framework">Source code</a></div>
+          <p>Python 3.12 prototype: policy engine, SQLite audit repository, service layer, demos and tests. Latest tagged release <a href="https://github.com/Taghreed-Almirabi/Integrated-EHR-Access-Control-Framework/releases/tag/v1.3.0-final">v1.3.0-final</a> (commit 0bb3017).</p>
+        </li>
+        <li>
+          <div><a href="https://github.com/Taghreed-Almirabi/Integrated-EHR-Access-Control-Framework/tree/main/docs">Design and operations documents</a></div>
+          <p>Testing and maintenance plan, deployment and configuration guide, Dockerfile and environment template.</p>
+        </li>
+        <li>
+          <div><a href="https://github.com/Taghreed-Almirabi/Integrated-EHR-Access-Control-Framework/tree/main/results">Evaluation evidence</a></div>
+          <p>Results CSV, environment record, evaluation chart and the complete pytest log.</p>
+        </li>
+      </ul>
+
+      <h3 style="margin-top:40px;">Release history</h3>
+      <table style="max-width:760px;">
+        <thead><tr><th scope="col">Tag</th><th scope="col">Date</th><th scope="col">What it added</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">v1.3.0-final</td><td class="num">24 Oct 2026</td><td>Final submission: 36-case benchmark, latency percentiles, environment record, pytest pin aligned</td></tr>
+          <tr><td class="mono">v1.2.0-unit7</td><td class="num">17 Oct 2026</td><td>System and acceptance testing, stability run, maintenance plan</td></tr>
+          <tr><td class="mono">v1.1.0-unit6</td><td class="num">8 Oct 2026</td><td>Integration evaluation, performance benchmark, deployment plan, Docker packaging</td></tr>
+          <tr><td class="mono">v1.0.0</td><td class="num">8 Oct 2026</td><td>First documented release with README</td></tr>
+          <tr><td class="mono">v0.2.0-tested</td><td class="num">8 Oct 2026</td><td>Unit tests for permit, deny, MFA, break-glass and audit integrity</td></tr>
+          <tr><td class="mono">v0.1.0-core</td><td class="num">7 Oct 2026</td><td>Core access-control engine</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="about">
+    <div class="wrap">
+      <h2>About</h2>
+      <div class="about">
+        <div>
+          <p>I am Taghreed Almirabi, a Master of Science in Information Technology candidate at the University of the People. This project is my capstone, and it grew out of a practical question: how can a hospital protect patient records under Saudi data-protection rules without slowing down the people who treat patients? The answer I built is small enough to read in an afternoon and tested well enough to trust.</p>
+          <p>The work covers requirements analysis with hospital stakeholders, policy design against the NIST RBAC model and NIST SP 800-63B-4, implementation in Python, automated testing at four levels, performance evaluation, and documentation to ISO/IEC 25010 quality characteristics.</p>
+        </div>
+        <div>
+          <h3>Links</h3>
+          <ul>
+            <li><a href="https://github.com/Taghreed-Almirabi">GitHub: Taghreed-Almirabi</a></li>
+            <li><a href="https://github.com/Taghreed-Almirabi/Integrated-EHR-Access-Control-Framework">Project repository</a></li>
+            <li><a href="https://www.uopeople.edu/programs/course/capstone-project/">MSIT 5910 course page</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <p>All users, patients and access scenarios in this project are synthetic. The prototype contains no real patient information and is not a production system.</p>
+    <p>© 2026 Taghreed Almirabi. Built as part of MSIT 5910-01, University of the People.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  var PERMISSIONS = {
+    physician: ["view_patient_record", "update_clinical_notes", "prescribe_medication"],
+    nurse: ["view_patient_record", "update_clinical_notes", "administer_medication"],
+    pharmacist: ["view_patient_record", "dispense_medication"],
+    lab_technician: ["view_patient_record", "record_lab_result"],
+    health_information_manager: ["view_patient_record", "export_patient_record", "review_audit_logs"],
+    it_systems_administrator: ["manage_user_accounts", "review_audit_logs"]
+  };
+  var PATIENT_ACTIONS = ["view_patient_record", "update_clinical_notes", "prescribe_medication", "administer_medication", "dispense_medication", "record_lab_result", "export_patient_record"];
+  var CLINICAL_ACTIONS = ["view_patient_record", "update_clinical_notes", "prescribe_medication", "administer_medication"];
+  var HIGH_RISK_ACTIONS = ["export_patient_record", "manage_user_accounts"];
+  var CLINICAL_ROLES = ["physician", "nurse"];
+
+  function has(list, value) { return list.indexOf(value) !== -1; }
+
+  function evaluate(r) {
+    if (!r.accountActive) return result("DENY", "Account is inactive.");
+    if (!r.authenticated) return result("DENY", "Authentication is required.");
+    if (!r.userId || !r.userId.trim()) return result("DENY", "A valid user identifier is required.");
+    if (r.emergency) return evaluateBreakGlass(r);
+    var allowed = PERMISSIONS[r.role] || [];
+    if (!has(allowed, r.action)) return result("DENY", "The requested action is not permitted for this role.");
+    if (has(PATIENT_ACTIONS, r.action) && !r.patientId) return result("DENY", "A patient identifier is required for this action.");
+    if (!r.onDuty) return result("DENY", "Access is outside the user's active duty period.");
+    if (has(CLINICAL_ROLES, r.role) && has(PATIENT_ACTIONS, r.action) && !r.assigned) return result("DENY", "The clinician is not assigned to this patient.");
+    var elevatedRisk = has(HIGH_RISK_ACTIONS, r.action) || !r.onNetwork || !r.managedDevice;
+    if (elevatedRisk && !r.mfaVerified) return result("STEP_UP_MFA", "Additional MFA verification is required for this context.");
+    return result("PERMIT", "Role and contextual access checks passed.");
+  }
+
+  function evaluateBreakGlass(r) {
+    if (!has(CLINICAL_ROLES, r.role)) return result("DENY", "Break-glass access is limited to authorized clinical roles.");
+    if (!has(CLINICAL_ACTIONS, r.action) || !r.patientId) return result("DENY", "Emergency access requires a patient and a clinical action.");
+    if (!r.justification || r.justification.trim().length < 10) return result("DENY", "A meaningful emergency justification is required.");
+    var expires = new Date(Date.now() + 15 * 60 * 1000);
+    return result("BREAK_GLASS_PERMIT", "Temporary emergency access granted and flagged for review.", expires.toISOString());
+  }
+
+  function result(decision, reason, expiresAt) { return { decision: decision, reason: reason, expiresAt: expiresAt || null }; }
+
+  var form = document.getElementById("request");
+  var decisionBox = document.getElementById("decision");
+  var codeEl = document.getElementById("decision-code");
+  var reasonEl = document.getElementById("decision-reason");
+  var auditEl = document.getElementById("decision-audit");
+  var justificationField = document.getElementById("justification-field");
+  var presetButtons = Array.prototype.slice.call(document.querySelectorAll(".presets button"));
+
+  function readForm() {
+    var f = form.elements;
+    return {
+      role: f.role.value,
+      action: f.action.value,
+      userId: f.user.value,
+      patientId: f.patient.value.trim(),
+      accountActive: f.account_active.checked,
+      authenticated: f.authenticated.checked,
+      onDuty: f.on_duty.checked,
+      assigned: f.assigned.checked,
+      onNetwork: f.on_network.checked,
+      managedDevice: f.managed_device.checked,
+      mfaVerified: f.mfa.checked,
+      emergency: f.emergency.checked,
+      justification: f.justification.value
+    };
+  }
+
+  function randomHex(bytes) {
+    var arr = new Uint8Array(bytes);
+    if (window.crypto && crypto.getRandomValues) { crypto.getRandomValues(arr); }
+    else { for (var i = 0; i < bytes; i++) arr[i] = Math.floor(Math.random() * 256); }
+    return Array.prototype.map.call(arr, function (b) { return ("0" + b.toString(16)).slice(-2); }).join("");
+  }
+
+  function hmacSha256Hex(key, message) {
+    if (!(window.crypto && crypto.subtle && window.TextEncoder)) return Promise.resolve(null);
+    var enc = new TextEncoder();
+    return crypto.subtle.importKey("raw", enc.encode(key), { name: "HMAC", hash: "SHA-256" }, false, ["sign"])
+      .then(function (k) { return crypto.subtle.sign("HMAC", k, enc.encode(message)); })
+      .then(function (sig) {
+        return Array.prototype.map.call(new Uint8Array(sig), function (b) { return ("0" + b.toString(16)).slice(-2); }).join("");
+      })
+      .catch(function () { return null; });
+  }
+
+  var renderToken = 0;
+  function render() {
+    var r = readForm();
+    justificationField.hidden = !r.emergency;
+    var out = evaluate(r);
+    decisionBox.setAttribute("data-decision", out.decision);
+    codeEl.textContent = out.decision;
+    reasonEl.textContent = out.reason;
+
+    var event = {
+      event_id: randomHex(8),
+      timestamp: new Date().toISOString(),
+      user_id: r.userId,
+      role: r.role,
+      action: r.action,
+      patient_id: r.patientId || null,
+      decision: out.decision,
+      reason: out.reason
+    };
+    var token = ++renderToken;
+    var lines = "audit event <span>" + event.event_id + "</span> at <span>" + event.timestamp + "</span>";
+    if (out.expiresAt) { lines += "<br>break-glass access expires <span>" + out.expiresAt + "</span>"; }
+    auditEl.innerHTML = lines + "<br>hmac-sha256 <span>computing…</span>";
+    hmacSha256Hex("synthetic-capstone-key", JSON.stringify(event)).then(function (hex) {
+      if (token !== renderToken) return;
+      auditEl.innerHTML = lines + "<br>hmac-sha256 <span>" + (hex ? hex.slice(0, 32) + "…" : "unavailable in this browser") + "</span>";
+    });
+  }
+
+  var PRESETS = {
+    permit: { role: "physician", action: "view_patient_record", user: "DR-1042", patient: "PT-2093", account_active: true, authenticated: true, on_duty: true, assigned: true, on_network: true, managed_device: true, mfa: false, emergency: false, justification: "" },
+    mfa: { role: "nurse", action: "update_clinical_notes", user: "RN-0317", patient: "PT-2093", account_active: true, authenticated: true, on_duty: true, assigned: true, on_network: true, managed_device: false, mfa: false, emergency: false, justification: "" },
+    deny: { role: "it_systems_administrator", action: "view_patient_record", user: "IT-0088", patient: "PT-2093", account_active: true, authenticated: true, on_duty: true, assigned: false, on_network: true, managed_device: true, mfa: false, emergency: false, justification: "" },
+    glass: { role: "physician", action: "view_patient_record", user: "DR-0561", patient: "PT-4410", account_active: true, authenticated: true, on_duty: true, assigned: false, on_network: true, managed_device: true, mfa: false, emergency: true, justification: "Unresponsive patient in the emergency department; attending physician unavailable." }
+  };
+
+  function applyPreset(name) {
+    var p = PRESETS[name];
+    var f = form.elements;
+    f.role.value = p.role; f.action.value = p.action; f.user.value = p.user; f.patient.value = p.patient;
+    ["account_active", "authenticated", "on_duty", "assigned", "on_network", "managed_device", "mfa", "emergency"].forEach(function (k) { f[k].checked = p[k]; });
+    f.justification.value = p.justification;
+    presetButtons.forEach(function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-preset") === name ? "true" : "false"); });
+    render();
+  }
+
+  presetButtons.forEach(function (b) {
+    b.setAttribute("aria-pressed", "false");
+    b.addEventListener("click", function () { applyPreset(b.getAttribute("data-preset")); });
+  });
+  form.addEventListener("input", function () {
+    presetButtons.forEach(function (b) { b.setAttribute("aria-pressed", "false"); });
+    render();
+  });
+  form.addEventListener("submit", function (e) { e.preventDefault(); render(); });
+
+  applyPreset("permit");
+})();
+</script>
+</body>
+</html>
