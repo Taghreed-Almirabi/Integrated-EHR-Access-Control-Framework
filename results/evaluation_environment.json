@@ -1,0 +1,10 @@
+{
+  "Operating system": "Windows-11-10.0.26200-SP0",
+  "Processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+  "Logical CPUs": "12",
+  "Physical memory": "7.7 GB",
+  "Python": "3.12.15",
+  "Warm-up requests": "10",
+  "Timed requests": "300",
+  "Timer": "time.perf_counter per request; tracemalloc peak over the timed block"
+}

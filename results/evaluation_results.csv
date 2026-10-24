@@ -1,6 +1,20 @@
 Metric,Result,Metric Type
-Decision accuracy,100.00%,Quantitative
-Average latency,3.704 ms,Quantitative
-Throughput,269.96 requests/second,Quantitative
-Peak memory,0.117 MB,Quantitative
+Decision accuracy,100.00% (36/36),Quantitative
+False permits,0,Quantitative
+Mean latency,3.196 ms,Quantitative
+Median latency,3.131 ms,Quantitative
+p95 latency,3.976 ms,Quantitative
+p99 latency,4.205 ms,Quantitative
+Minimum latency,2.564 ms,Quantitative
+Maximum latency,4.500 ms,Quantitative
+Throughput,312.18 requests/second,Quantitative
+Peak memory,0.127 MB,Quantitative
 Interface clarity,4.60/5,Qualitative
+Operating system,Windows-11-10.0.26200-SP0,Environment
+Processor,"Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",Environment
+Logical CPUs,12,Environment
+Physical memory,7.7 GB,Environment
+Python,3.12.15,Environment
+Warm-up requests,10,Environment
+Timed requests,300,Environment
+Timer,time.perf_counter per request; tracemalloc peak over the timed block,Environment
